@@ -36,13 +36,36 @@ GROUP BY order_details.order_id;
 # Lo siguiente que nos han pedido es la misma consulta anterior pero con la adición de la cantidad de dinero que han pedido 
 # por esa cantidad de objetos, teniendo en cuenta los descuentos, etc. Ojo que los descuentos en nuestra tabla nos salen en 
 # porcentajes, 15% nos sale como 0.15.
+SELECT customers.company_name, customers.customer_id, orders.customer_id, orders.order_date
+FROM customers INNER JOIN orders
+USING (customer_id);
 
+SELECT orders.order_date, orders.order_id, order_details.order_id, SUM(order_details.quantity * order_details.unit_price * order_details.discount) AS 'Pedido con Descuento'
+FROM orders INNER JOIN order_details
+USING (order_id)
+WHERE order_details.discount <> 0
+GROUP BY order_details.order_id; -- Me salen solo los pedidos que tienen descuento
+
+SELECT orders.order_date, orders.order_id, order_details.order_id, SUM(order_details.quantity * order_details.unit_price) AS 'Precio sin Descuento',
+CASE
+	WHEN order_details.discount <> 0 THEN SUM((order_details.quantity * order_details.unit_price) * order_details.discount)
+    END AS 'Precio con Descuento'
+FROM orders INNER JOIN order_details
+USING (order_id)
+GROUP BY order_details.order_id;
+
+-- codigo a parte -- No uso group by y sum porque hay units que no tienen discount y units que si tienen
+SELECT *, unit_price * quantity AS 'Precio sin Descuento',
+CASE
+	WHEN discount <> 0 THEN (unit_price * quantity) * discount
+    END AS 'Precio con Descuento'
+FROM order_details;
 
 
 # Ejercicio 4: BONUS: Pedidos que han realizado cada compañía y su fecha:
 # Después de estas solicitudes desde UK y gracias a la utilidad de los resultados que se han obtenido, desde la central nos han pedido 
 #una consulta que indique el nombre de cada compañia cliente junto con cada pedido que han realizado y su fecha.
-
+SELECT 
 
 
 # Ejercicio 5: BONUS: Tipos de producto vendidos:
