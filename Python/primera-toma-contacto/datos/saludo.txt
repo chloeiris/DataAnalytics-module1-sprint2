@@ -1,0 +1,5 @@
+Hola Adalabers!!!
+
+Estamos en la sesión de pair-programming para familiarizarnos con la gestión de carpetas y ficheros desde Python 🙂🌊
+
+Esto esta siendo suuuper divertidooooo
