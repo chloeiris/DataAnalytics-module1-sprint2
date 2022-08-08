@@ -14,6 +14,8 @@ WHERE customers.country = 'UK'
 GROUP BY customers.customer_id 
 ORDER BY customers.customer_id; 
 
+
+
 # Ejercicio 2
 # Productos pedidos por empresa en UK por año:
 # Desde Reino Unido se quedaron muy contentas con nuestra rápida respuesta a su petición anterior y han 
@@ -21,16 +23,7 @@ ORDER BY customers.customer_id;
 # sirva para conocer cuántos objetos ha pedido cada empresa cliente de UK durante cada año. Nos piden 
 # concretamente conocer el nombre de la empresa, el año, y la cantidad de objetos que han pedido. Para 
 # ello hará falta hacer 2 joins.
-SELECT customers.company_name, customers.customer_id, orders.customer_id, YEAR(orders.order_date)
-FROM customers INNER JOIN orders
-USING (customer_id);
 
-SELECT orders.order_date, orders.order_id, order_details.order_id, SUM(order_details.quantity)
-FROM orders INNER JOIN order_details
-USING (order_id)
-GROUP BY order_details.order_id;
-
--- probando a ver si puedo hacer dos joins juntos ... OH YEAH!
 SELECT customers.company_name AS 'Nombre Empresa', YEAR(orders.order_date) AS 'Año', SUM(order_details.quantity) AS 'Num Objetos'
 FROM customers INNER JOIN orders 
 ON customers.customer_id = orders.customer_id 
@@ -40,46 +33,11 @@ GROUP BY order_details.order_id;
 
 
 
-
 # Ejercicio 3
 # Mejorad la query anterior:
 # Lo siguiente que nos han pedido es la misma consulta anterior pero con la adición de la cantidad de dinero que han pedido 
 # por esa cantidad de objetos, teniendo en cuenta los descuentos, etc. Ojo que los descuentos en nuestra tabla nos salen en 
 # porcentajes, 15% nos sale como 0.15.
-SELECT customers.company_name, customers.customer_id, orders.customer_id, orders.order_date
-FROM customers INNER JOIN orders
-USING (customer_id);
-
-SELECT orders.order_date, orders.order_id, order_details.order_id, SUM(order_details.quantity * order_details.unit_price * order_details.discount) AS 'Pedido con Descuento'
-FROM orders INNER JOIN order_details
-USING (order_id)
-WHERE order_details.discount <> 0
-GROUP BY order_details.order_id; -- Me salen solo los pedidos que tienen descuento
-
-SELECT orders.order_date, orders.order_id, order_details.order_id, SUM(order_details.quantity * order_details.unit_price) AS 'Precio sin Descuento',
-CASE
-	WHEN order_details.discount <> 0 THEN SUM((order_details.quantity * order_details.unit_price) * order_details.discount)
-    END AS 'Precio con Descuento'
-FROM orders INNER JOIN order_details
-USING (order_id)
-GROUP BY order_details.product_id;
-
--- codigo a parte -- No uso group by y sum porque hay units que no tienen discount y units que si tienen
-SELECT *, unit_price * quantity AS 'Precio sin Descuento',
-CASE
-	WHEN discount <> 0 THEN (unit_price * quantity) * discount
-    END AS 'Precio con Descuento'
-FROM order_details;
-
--- sigo probando
-SELECT *,
-CASE
-	WHEN discount = 0 THEN (unit_price * quantity) 
-    WHEN discount <> 0 THEN (unit_price * quantity) * discount  -- No necesito etiquetar a cada una, solo las que tengan descuento las multiplicare por el descuento, y las que no, pues no.
-    END AS 'Dinero Total'
-FROM order_details;
-
--- completo con el join
 
 SELECT customers.company_name AS 'Nombre Empresa', YEAR(orders.order_date) AS 'Año', SUM(order_details.quantity) AS 'Num Objetos',
 CASE
@@ -93,7 +51,6 @@ INNER JOIN customers
 ON customers.customer_id = orders.customer_id
 GROUP BY order_details.order_id;
 
--- WoooW!
 
 
 # Ejercicio 4: BONUS: Pedidos que han realizado cada compañía y su fecha:
@@ -104,7 +61,6 @@ SELECT customers.company_name AS 'Nombre Empresa', orders.order_id AS 'ID Pedido
 FROM customers INNER JOIN orders
 USING (customer_id);
 
--- Pues era sencillo para ser un bonus no?
 
 # Ejercicio 5: BONUS: Tipos de producto vendidos:
 # Ahora nos piden una lista con cada tipo de producto que se han vendido, sus categorías, nombre de la categoría y el nombre del producto,
@@ -123,16 +79,4 @@ JOIN order_details
 USING (product_id)
 GROUP BY order_details.product_id;
 
--- probando con distintos group bys el resultado es el mismo
-SELECT categories.category_id AS 'Category ID', categories.category_name AS 'Category Name', products.product_name AS 'Product Name',
-CASE
-	WHEN order_details.discount = 0 THEN (order_details.unit_price * order_details.quantity) 
-    WHEN order_details.discount <> 0 THEN (order_details.unit_price * order_details.quantity) * order_details.discount
-    END AS 'Dinero Total' 
-
-FROM categories JOIN products
-USING (category_id)
-JOIN order_details
-USING (product_id)
-GROUP BY products.product_id;
 
