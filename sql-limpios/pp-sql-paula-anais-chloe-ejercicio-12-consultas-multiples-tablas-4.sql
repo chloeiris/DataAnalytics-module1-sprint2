@@ -7,7 +7,6 @@ USE northwind;
 # un tipo de producto. En concreto, tienen especial interés por los productos con categoría "Beverages".
 # Devuelve el ID del producto, el nombre del producto y su ID de categoría.
  
-
 SELECT product_id, product_name, category_id
 FROM products 
 WHERE category_id IN (
@@ -34,19 +33,6 @@ GROUP BY country;
 # Extraed el OrderId y el nombre del cliente que pidieron más de 20 artículos del producto 
 # "Grandma's Boysenberry Spread" (ProductID 6) en un solo pedido. 
 
-SELECT customers.company_name, orders.order_id
-FROM customers JOIN orders
-WHERE order_id IN (
-	SELECT order_id 
-	FROM orders
-	WHERE order_id IN (
-		SELECT order_id
-		FROM order_details
-		WHERE quantity > 20 AND product_id = 6));
-        
-        -- (Chloe) No estoy satisfecha con este resultado, salen los order ids repetidos... y eso no tiene sentido
-        
-
 SELECT orders.order_id, customers.company_name
 FROM customers JOIN orders
 ON customers.customer_id = orders.customer_id
@@ -59,20 +45,19 @@ HAVING orders.order_id IN (
 									WHERE quantity > 20 AND product_id = 6))
 ORDER BY orders.order_id;
 
--- (Chloe) Ahora sí!! (coincide ademas con los resultados que nos dan en el gitbook)
 
-
+#Ejercicio 4:
 #Extraed los 10 productos más caros
 #Nos siguen pidiendo más queries correlacionadas. En este caso queremos saber cuáles son los 10 productos más caros.
 #Los resultados esperados de esta query son:
 
--- (Chloe) Sin subconsulta correlacionada
+-- Sin subconsulta correlacionada
 SELECT product_name AS 'Ten Most Expensive Products', unit_price AS 'Unit Price'
 FROM products
 ORDER BY unit_price DESC
 LIMIT 10;
 
--- (Chloe) Creo que no tiene mucho sentido hacer esta query con una subconsulta correlacionada, pero en los apuntes se ve esta forma de hacerlo
+-- Con subconsulta correlacionada
 SELECT product_name AS 'Ten Most Expensive Products', unit_price AS 'Unit Price'
 FROM products AS p1
 WHERE p1.unit_price > ANY (SELECT unit_price
@@ -81,31 +66,10 @@ ORDER BY unit_price DESC
 LIMIT 10;
 
 
-
-
-#BONUS
+#BONUS:
 #Qué producto es más popular
 #Extraed cuál es el producto que más ha sido comprado y la cantidad que se compró.
-SELECT products.product_name AS 'Product Name', MAX(SUM(order_details.quantity)) AS 'Total Quantity'
-FROM products JOIN order_details
-ON products.product_id = order_details.product_id
-GROUP BY order_details.product_id;
 
--- (Chloe) voy a probar por partes, porque no me deja así---> era por el MAX(SUM())
-SELECT product_id AS 'Product Name', SUM(quantity) AS 'Total Quantity'
-FROM order_details
-GROUP BY product_id
-ORDER BY SUM(quantity) DESC;
-
--- (Chloe) voy a intentar seleccionar el máximo
-SELECT product_id AS 'Product Name', SUM(quantity) AS 'Total Quantity'
-FROM order_details AS o1
-GROUP BY product_id
-HAVING SUM(quantity) >= ALL (SELECT SUM(quantity)           -- muy importante el '=' en el '>='
-								FROM order_details AS o2
-                                GROUP BY product_id);
-
--- (Chloe) Ahora voy a unirlo con la tabla products para sacar el nombre
 SELECT products.product_id, products.product_name AS 'Product Name', SUM(order_details.quantity) AS 'Total Quantity'
 FROM products JOIN order_details
 ON products.product_id = order_details.product_id
@@ -116,7 +80,6 @@ WHERE products.product_id IN (SELECT product_id
 															FROM order_details AS o2
 															GROUP BY product_id));
                                                             
-                                                            
--- oh yeahhh!
+	
 
 
