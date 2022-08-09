@@ -15,11 +15,6 @@ WHERE order_date >= ALL(
 				
 
 #EJERCICIO 2:
-# Extraed el precio unitario (unit_price) de cada producto vendido.
-# Supongamos que ahora nuestro jefe quiere un informe de los productos más vendidos y su precio unitario.
-# De nuevo lo tendréis que hacer con queries correlacionadas.
-
--- Nueva redacción del enunciado:
 # Extraed el precio unitario máximo (unit_price) de cada producto vendido.
 # Supongamos que ahora nuestro jefe quiere un informe de los productos vendidos y su precio unitario. 
 # De nuevo lo tendréis que hacer con queries correlacionadas.
@@ -32,20 +27,6 @@ HAVING MAX(A1.unit_price) >= ALL (
                     FROM order_details AS A2
                     WHERE A1.product_id = A2.product_id);
                     
-SELECT product_id, MAX(unit_price)
-FROM order_details
-GROUP BY product_id;
-      -- (Chloe) las dos consultas de arriba dan el mismo resultado, voy a probar cosas...      
-      
-SELECT product_id, MAX(unit_price)
-FROM order_details AS t1
-GROUP BY product_id
-HAVING MAX(unit_price) >= ALL (SELECT MAX(unit_price)
-								FROM order_details AS t2
-                                GROUP BY product_id);
-	  -- (Chloe) este sería el producto más caro y solo cambia el where con respecto a la primera consulta
-      -- Será que el "Where A1.product_id = A2.product_id" hace que lo compare con sí mismo, por eso te saca el precio 
-      -- más alto de cada producto (pero no hace falta una subconsulta correlacionada para eso...)
 
 # EJERCICIO 3:
 # Ciudades que empiezan con "A" o "B".
