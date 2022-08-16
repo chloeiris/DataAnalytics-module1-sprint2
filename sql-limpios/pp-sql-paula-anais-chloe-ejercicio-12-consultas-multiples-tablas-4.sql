@@ -72,8 +72,9 @@ LIMIT 10;
 
 SELECT products.product_id, products.product_name AS 'Product Name', SUM(order_details.quantity) AS 'Total Quantity'
 FROM products JOIN order_details
-ON products.product_id = order_details.product_id
-WHERE products.product_id IN (SELECT product_id
+WHERE products.product_id = order_details.product_id
+GROUP BY products.product_id
+HAVING products.product_id IN (SELECT product_id
 								FROM order_details AS o1
 								GROUP BY product_id
 								HAVING SUM(quantity) >= ALL (SELECT SUM(quantity)         
